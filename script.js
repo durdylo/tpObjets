@@ -48,6 +48,7 @@ let places = [{
   }
 ];
 
+
 function addPlace(placeName, placeType, placeDescription, placeAdress, longitude, latitude) {
   let newPlace = {
     placeName: placeName,
@@ -61,10 +62,10 @@ function addPlace(placeName, placeType, placeDescription, placeAdress, longitude
 }
 
 
-
+let newTable;
 
 function displayPlacesInHTML(tableObjects) {
-  let newTable = document.createElement("table");
+  newTable = document.createElement("table");
   newTable.id = "tablePlaces"
   newTable.classList.add = ("table");
   let sectionTable = document.getElementById("tableSection")
@@ -118,7 +119,6 @@ let adressInput = document.getElementById("adress");
 let descriptionInput = document.getElementById("description");
 let longitudeInput = document.getElementById("longitude");
 let latitudeInput = document.getElementById("latitude");
-let idTable = document.getElementById("tablePlaces")
 let sectionTableID = document.getElementById("tableSection")
 
 
@@ -131,31 +131,48 @@ addingButton.addEventListener("click", function() {
   let longitude1 = longitudeInput.value;
   let latitude1 = latitudeInput.value;
 
-  sectionTableID.removeChild(idTable);
+  sectionTableID.removeChild(newTable);
   addPlace(name, type, description, adress, longitude1, latitude1);
   displayPlacesInHTML(places)
 
 
 });
 
-var mymap = L.map('mapid').setView([43.2938004, 5.2404139], 11);
+let mymap = L.map('mapid').setView([43.2938004, 5.2404139], 11)
 
-L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZHVyZHlsbyIsImEiOiJjazV3NjdlcjcwaXN3M2xxd2RnMm9iejZlIn0.NfY0G4gf0LJ3J1BDoNfpZw', {
   maxZoom: 18,
-  attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+  attribution: 'Map data &copy; <a href="https://studio.mapbox.com/styles/durdylo/ck5w7uktv0iwx1jovnbngm5dk/edit/#10.95/43.2819/5.3807</a>, ' +
     'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
   id: 'mapbox/streets-v11'
 }).addTo(mymap);
+let theaters = L.layerGroup();
+let restaurant = L.layerGroup();
+let library = L.layerGroup();
+let placesMarseille = L.layerGroup();
 
-function objectContent(placeName, placeType, placeDescription) {
-  objectContent1 = placeName + " <br />" + placeType + "<br />" + placeDescription
-  return objectContent1
-}
+let overlays = {
+  "Cinéma": theaters,
+  "Restaurant": restaurant,
+  "Bibliothèque": library,
+  "lieux": placesMarseille
+};
+
+L.control.layers(overlays).addTo(mymap);
+
 for (let i = 0; i < places.length; i++) {
   let currentElement = places[i]
-  let placeContent = objectContent(currentElement.placeName, currentElement.placeType, currentElement.placeDescription);
-  L.marker([currentElement.latitude, currentElement.longitude]).addTo(mymap)
-    .bindPopup(placeContent).openPopup();
+  L.marker([currentElement.latitude, currentElement.longitude]).addTo(placesMarseille)
+    .bindPopup(currentElement.placeName + " <br />" + currentElement.placeType + " <br />" + currentElement.placeDescription).openPopup()
+  if (currentElement.placeType == "Restaurant") {
+    L.marker([currentElement.latitude, currentElement.longitude]).addTo(restaurant)
+      .bindPopup(currentElement.placeName + " <br />" + currentElement.placeType + " <br />" + currentElement.placeDescription).openPopup()
+  } else if (currentElement.placeType == "Cinéma") {
+    L.marker([currentElement.latitude, currentElement.longitude]).addTo(theaters)
+      .bindPopup(currentElement.placeName + " <br />" + currentElement.placeType + " <br />" + currentElement.placeDescription).openPopup()
+  } else if (currentElement.placeType == "Bibliotheque") {
+    L.marker([currentElement.latitude, currentElement.longitude]).addTo(library)
+      .bindPopup(currentElement.placeName + " <br />" + currentElement.placeType + " <br />" + currentElement.placeDescription).openPopup()
 
+  }
 }
